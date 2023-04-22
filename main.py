@@ -135,6 +135,14 @@ async def token_response(request: Request):
                     except KeyError:
                         pass
                 data = await resp.read()
+
+    # Add CORS headers to the response
+    headers['Access-Control-Allow-Credentials'] = 'true'
+    headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS'
+    headers['Access-Control-Allow-Headers'] = 'DNT,X-Mx-ReqToken,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range'
+    headers['Access-Control-Max-Age'] = '31536000'
+    headers['Cache-Control'] = 'max-age=14400'
+
     return Response(content=data, headers=headers)
 
 
