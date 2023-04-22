@@ -119,29 +119,14 @@ async def token_response(request: Request):
     headers_ = json.loads(headers_)
     headers_[
         "User-Agent"] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36}"
-    headers = {'Access-Control-Allow-Origin': '*',
-               'Access-Control-Allow-Methods': '*',
-               'Access-Control-Allow-Headers': '*',
-               'Access-Control-Max-Age': '3600',
-               'Access-Control-Allow-Credentials': 'true',
-               'Access-Control-Expose-Headers': '*',
-               'Access-Control-Request-Method': '*',
-               'Access-Control-Request-Headers': '*',
-               'Origin': '*',
-               'Vary': '*',
-               'Referer': '*',
-               'Server': '*',
-               'x-cache': '*',
-               'via': '*',
-               'x-amz-cf-pop': '*',
-               'x-amz-cf-id': '*'}
+    headers = {'Access-Control-Allow-Origin': '*'}
     async with aiohttp.ClientSession(headers=multidict.CIMultiDict(headers_)) as session:
         url = request.query_params.get('url')
         url = TOKENS[url]
         if url:
             async with session.get(url) as resp:
                 headers = resp.headers.copy()
-                headers.update(headers)  # Update with the additional CORS headers
+                headers['Access-Control-Allow-Origin'] = '*'  # Add CORS header
                 del_head = ['Vary', 'Server', 'Report-To', 'NEL', 'Transfer-Encoding', 'Content-Encoding',
                             'Content-Length']
                 for key in del_head:
