@@ -120,19 +120,22 @@ async def token_response(request: Request):
     headers_[
         "User-Agent"] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36}"
     headers = {'Access-Control-Allow-Origin': '*'}
-    # Add CORS headers to the response
-    headers['Access-Control-Allow-Credentials'] = 'true'
-    headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS'
-    headers['Access-Control-Allow-Headers'] = 'DNT,X-Mx-ReqToken,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type'
-    
-    # Get query parameters
-    url = request.query_params.get('url')
-    # Process the url and generate a token using NEW_ID() function
-    token = NEW_ID(url)
-    ret_head = json.dumps(dict(headers_))
-    
-    # Return the token in the response
-    return Response(content=token, headers=headers)
+    async with aiohttp.ClientSession(headers=multidict.CIMultiDict(headers_)) as session:
+        url = request.query_params.get('url')
+        url = TOKENS[url]
+        if url:
+            async with session.get(url) as resp:
+                headers = resp.headers.copy()
+                headers['Access-Control-Allow-Origin'] = '*'  # Add CORS header
+                del_head = ['Vary', 'Server', 'Report-To', 'NEL', 'Transfer-Encoding', 'Content-Encoding',
+                            'Content-Length']
+                for key in del_head:
+                    try:
+                        del headers[key]
+                    except KeyError:
+                        pass
+                data = await resp.read()
+    return Response(content=data, headers=headers)
 
 
 app.add_api_route('/cors', handle, methods=['GET'])
