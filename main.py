@@ -126,7 +126,7 @@ async def token_response(request: Request):
         if url:
             async with session.get(url) as resp:
                 headers = resp.headers.copy()
-                headers['Access-Control-Allow-Origin'] = '*'  # Add CORS header
+                headers['Access-Control-Allow-Origin'] = '*'
                 del_head = ['Vary', 'Server', 'Report-To', 'NEL', 'Transfer-Encoding', 'Content-Encoding',
                             'Content-Length']
                 for key in del_head:
@@ -136,6 +136,7 @@ async def token_response(request: Request):
                         pass
                 data = await resp.read()
     return Response(content=data, headers=headers)
+
 
 
 app.add_api_route('/cors', handle, methods=['GET'])
