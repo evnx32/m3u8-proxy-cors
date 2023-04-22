@@ -138,7 +138,6 @@ async def token_response(request: Request):
     return Response(content=data, headers=headers)
 
 
-
 app.add_api_route('/cors', handle, methods=['GET'])
 app.add_api_route('/', home, methods=['GET'])
 app.add_api_route('/token', token_response, methods=['GET'])
